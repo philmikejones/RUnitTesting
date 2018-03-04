@@ -1,15 +1,24 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-RUnitTesting
-============
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# RUnitTesting
 
 Test functions and data in R.
 
-Install `usethis`
------------------
+## Install `usethis`
 
 We'll use the `usethis` package to make a lot of the set up easier
 
-``` r
+```{r install-usethis, eval=FALSE}
 install.packages("usethis")
 ```
