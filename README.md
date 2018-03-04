@@ -5,8 +5,6 @@
 RUnitTesting
 ============
 
-How confident are you that your outputs (data or functions) are correct?
-
 Setup
 -----
 
@@ -23,4 +21,5 @@ Once these packages are installed set up the following (although these are often
 1.  Add a DESCRIPTION with `usethis::use_description()`
 2.  Add a license. Either use one of the `usethis` license creators, for example `usethis::use_mit_license()`, or add a copyright note (see `http://r-pkgs.had.co.nz/description.html#license`).
 3.  Set up `travis` with `usethis::use_travis()`
-4.  (Optional) Set up coverage with `usethis::use_coverage()`. Both `coveralls.io` and `codecov.io` are free for open source projects, and `codecov.io` allows you to test coverage for one private github repo.
+4.  Set up `testthat` with `usethis::use_testthat()`
+5.  (Optional) Set up coverage with `usethis::use_coverage()`. Both `coveralls.io` and `codecov.io` are free for open source projects, and `codecov.io` allows you to test coverage for one private github repo.
