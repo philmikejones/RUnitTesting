@@ -4,6 +4,9 @@ output: github_document
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+[![Travis build status](https://travis-ci.org/philmikejones/RUnitTesting.svg?branch=master)](https://travis-ci.org/philmikejones/RUnitTesting)
+[![Coverage status](https://codecov.io/gh/philmikejones/RUnitTesting/branch/master/graph/badge.svg)](https://codecov.io/github/philmikejones/RUnitTesting?branch=master)
+
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -13,12 +16,22 @@ knitr::opts_chunk$set(
 
 # RUnitTesting
 
-Test functions and data in R.
+How confident are you that your outputs (data or functions) are correct?
 
-## Install `usethis`
 
-We'll use the `usethis` package to make a lot of the set up easier
+## Setup
+
+First we need to install a few packages:
 
 ```{r install-usethis, eval=FALSE}
-install.packages("usethis")
+install.packages(c("usethis", "testthat", "covr"))
 ```
+
+`usethis` makes it easier to configure the project; `testthat` will do the actual testing; and `covr` tells us what lines/functions have already been tested.
+
+Once these packages are installed set up the following (although these are often used for packages they're useful for data analysis projects too):
+
+1. Add a DESCRIPTION with `usethis::use_description()`
+1. Add a license. Either use one of the `usethis` license creators, for example `usethis::use_mit_license()`, or add a copyright note (see `http://r-pkgs.had.co.nz/description.html#license`).
+1. Set up `travis` with `usethis::use_travis()`
+1. (Optional) Set up coverage with `usethis::use_coverage()`. Both `coveralls.io` and `codecov.io` are free for open source projects, and `codecov.io` allows you to test coverage for one private github repo.
