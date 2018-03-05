@@ -223,6 +223,19 @@ is.vector(x)</code></pre>
 <p>The example tests here are relatively trivial, but are only designed to show you how to test, not <em>what</em> to test. Let’s load the packages we need and save some data to a temporary directory demonstrate. The data is very close to my heart and is available from the <a href="http://www.ico.org/new_historical.asp">International Coffee Organization</a>:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VwcHJlc3NNZXNzYWdlcyhsaWJyYXJ5KFwidGlkeXZlcnNlXCIpKVxubGlicmFyeShcInN0cmluZ3JcIilcbmxpYnJhcnkoXCJhc3NlcnR0aGF0XCIpXG5gYGAifQ== -->
+<pre class="r"><code>suppressMessages(library(&quot;tidyverse&quot;))
+library(&quot;stringr&quot;)
+library(&quot;assertthat&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYYXNzZXJ0dGhhdOKAmVxuXG5UaGUgZm9sbG93aW5nIG9iamVjdCBpcyBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOnRpYmJsZeKAmTpcblxuICAgIGhhc19uYW1lXG4ifQ== -->
+<pre><code>
+Attaching package: ‘assertthat’
+
+The following object is masked from ‘package:tibble’:
+
+    has_name</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
@@ -300,16 +313,11 @@ assertthat::noNA(coffee$country)</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>This test fails because there are a number of observations that aren’t counties, such as the European Union, a <code>Total</code>, and the copyright information for the data. There’s also a ‘<code>Belgium/Luxembourg</code>’ row where the data for these countries was combined in earlier years. Lets remove these and re-test (first I’m going to save the total for a later test):</p>
+<p>This test fails because there are a number of observations that aren’t counties, such as the European Union, a <code>Total</code>, and the copyright information for the data. There’s also a ‘<code>Belgium/Luxembourg</code>’ row where the data for these countries was combined in earlier years. Lets remove these and re-test:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29mZmVlX3RvdGFsIDwtIFxuICBjb2ZmZWUgJT4lIFxuICBmaWx0ZXIoY291bnRyeSA9PSBcIlRvdGFsXCIpICU+JSBcbiAgc2VsZWN0KGAyMDEzYCkgJT4lIFxuICBhcy5udW1lcmljKC4pXG5jb2ZmZWUgPC0gXG4gIHJlYWR4bDo6cmVhZF94bHN4KHRlbXAsIHNraXAgPSAzKSAlPiUgXG4gIHJlbmFtZShjb3VudHJ5ID0gXCJDYWxlbmRhciB5ZWFyc1wiKSAlPiUgXG4gIHNlbGVjdChjb3VudHJ5LCBgMjAxM2ApICU+JSBcbiAgZmlsdGVyKCFpcy5uYShjb3VudHJ5KSkgJT4lIFxuICBmaWx0ZXIoXG4gICAgY291bnRyeSAhPSBcIkV1cm9wZWFuIFVuaW9uXCIsXG4gICAgY291bnRyeSAhPSBcIlRvdGFsXCIsXG4gICAgIXN0cl9kZXRlY3QoY291bnRyeSwgXCJJbnRlcm5hdGlvbmFsIENvZmZlZSBPcmdhbml6YXRpb25cIiksXG4gICAgY291bnRyeSAhPSBcIkJlbGdpdW0vTHV4ZW1ib3VyZ1wiXG4gIClcbmFzc2VydHRoYXQ6OmFyZV9lcXVhbChucm93KGNvZmZlZSksIDM0TClcbmBgYCJ9 -->
-<pre class="r"><code>coffee_total &lt;- 
-  coffee %&gt;% 
-  filter(country == &quot;Total&quot;) %&gt;% 
-  select(`2013`) %&gt;% 
-  as.numeric(.)
-coffee &lt;- 
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29mZmVlIDwtIFxuICByZWFkeGw6OnJlYWRfeGxzeCh0ZW1wLCBza2lwID0gMykgJT4lIFxuICByZW5hbWUoY291bnRyeSA9IFwiQ2FsZW5kYXIgeWVhcnNcIikgJT4lIFxuICBzZWxlY3QoY291bnRyeSwgYDIwMTNgKSAlPiUgXG4gIGZpbHRlcighaXMubmEoY291bnRyeSkpICU+JSBcbiAgZmlsdGVyKFxuICAgIGNvdW50cnkgIT0gXCJFdXJvcGVhbiBVbmlvblwiLFxuICAgIGNvdW50cnkgIT0gXCJUb3RhbFwiLFxuICAgICFzdHJfZGV0ZWN0KGNvdW50cnksIFwiSW50ZXJuYXRpb25hbCBDb2ZmZWUgT3JnYW5pemF0aW9uXCIpLFxuICAgIGNvdW50cnkgIT0gXCJCZWxnaXVtL0x1eGVtYm91cmdcIlxuICApXG5hc3NlcnR0aGF0OjphcmVfZXF1YWwobnJvdyhjb2ZmZWUpLCAzNEwpXG5gYGAifQ== -->
+<pre class="r"><code>coffee &lt;- 
   readxl::read_xlsx(temp, skip = 3) %&gt;% 
   rename(country = &quot;Calendar years&quot;) %&gt;% 
   select(country, `2013`) %&gt;% 
@@ -327,35 +335,157 @@ assertthat::are_equal(nrow(coffee), 34L)</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Another problem fixed. Now, lets see if everything adds up correctly:</p>
+<p>Another problem fixed. Now we have our script to prepare the data and our tests to make sure it’s working as intended. They should look something like this now:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYXNzZXJ0dGhhdDo6YXJlX2VxdWFsKFxuICBzdW0oY29mZmVlJGAyMDEzYCksIGNvZmZlZV90b3RhbFxuKVxuYGBgIn0= -->
-<pre class="r"><code>assertthat::are_equal(
-  sum(coffee$`2013`), coffee_total
-)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYXNzZXJ0dGhhdDo6bm9OQShjb2ZmZWUkYDIwMTNgKVxuXG5gYGAifQ== -->
+<pre class="r"><code>assertthat::noNA(coffee$`2013`)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFRSVUVcbiJ9 -->
+<pre><code>[1] TRUE</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>One of the advantages of having specified our tests is that if we go back and change something in our script and accidentally break something, the tests will alert us. Imagine we accidentally remove one of the countries:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29mZmVlIDwtIGNvZmZlZVsxOjMzLCBdICAjIG9vcHMsIHdlIG1lYW50IDM0IChvciBldmVuIGJldHRlciBucm93KGNvZmZlZSkhKVxuYGBgIn0= -->
+<pre class="r"><code>coffee &lt;- coffee[1:33, ]  # oops, we meant 34 (or even better nrow(coffee)!)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Now the tests will fail alerting us to the issue:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYXNzZXJ0dGhhdDo6bm9OQShjb2ZmZWUkY291bnRyeSlcbmBgYCJ9 -->
+<pre class="r"><code>assertthat::noNA(coffee$country)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFRSVUVcbiJ9 -->
+<pre><code>[1] TRUE</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYXNzZXJ0dGhhdDo6bm9OQShjb2ZmZWUkYDIwMTNgKVxuYGBgIn0= -->
+<pre class="r"><code>assertthat::noNA(coffee$`2013`)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFRSVUVcbiJ9 -->
+<pre><code>[1] TRUE</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYXNzZXJ0dGhhdDo6YXJlX2VxdWFsKG5yb3coY29mZmVlKSwgMzRMKVxuYGBgIn0= -->
+<pre class="r"><code>assertthat::are_equal(nrow(coffee), 34L)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiWzFdIEZBTFNFXG4ifQ== -->
 <pre><code>[1] FALSE</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>So, no. But, the difference is pretty small so it’s likely to be a rounding error. We can change the tolerance of the test to make it pass in this case. This means we can still include the test and, if we did something drastic to the data (like drop the USA by mistake) we’d still notice:</p>
+</div>
+<div id="testing-functions" class="section level2">
+<h2>Testing functions</h2>
+<p>The other things you should test are functions. Functions are useful to perform the same procedure on multiple objects. Imagine we want to convert the units in our <code>coffee</code> table from its current ‘thousands of 60kg bags’ to simply kg. Ordinarily in R we’d just do this as a vector operation, but lets write a function to illustrate the point. Create the function in <code>R/</code> which we can do automatically with <code>usethis</code>:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYXNzZXJ0dGhhdDo6YXJlX2VxdWFsKFxuICBzdW0oY29mZmVlJGAyMDEzYCksIGNvZmZlZV90b3RhbCxcbiAgdG9sID0gMTBcbilcbmBgYCJ9 -->
-<pre class="r"><code>assertthat::are_equal(
-  sum(coffee$`2013`), coffee_total,
-  tol = 10
-)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoidXNldGhpczo6dXNlX3IoXCJjb252ZXJ0LXVuaXRcIikifQ== -->
+<pre class="r"><code>usethis::use_r(&quot;convert-unit&quot;)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFRSVUVcbiJ9 -->
-<pre><code>[1] TRUE</code></pre>
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>The function itself should take a number, multiply it by 60, and multiply it by 1000:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbImNvbnZlcnRfYmFnc19rZyA8LSBmdW5jdGlvbihiYWdzKSB7IiwiICBrZyA9IGJhZ3MgKiA2MCAqIDEwMDAiLCIgIGtnIiwifSJdfQ== -->
+<pre class="r"><code>convert_bags_kg &lt;- function(bags) {
+  kg = bags * 60 * 1000
+  kg
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>You can load functions in <code>R/</code> files with <code>devtools::load_all()</code>.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGV2dG9vbHM6OmxvYWRfYWxsKClcbmBgYCJ9 -->
+<pre class="r"><code>devtools::load_all()</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiTG9hZGluZyBSVW5pdFRlc3RpbmdcbiJ9 -->
+<pre><code>Loading RUnitTesting</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Before we use the function, lets test it and make sure it produces the correct output. I would expect 50 units in the coffee table to be equivalent to (50 <span class="math inline">\(\times\)</span> 60 <span class="math inline">\(\times\)</span> 1000 <span class="math inline">\(=\)</span>) 3,000,000kg. I would also expect that if the function encountered an <code>NA</code> it would return an <code>NA</code> (<code>NA</code> <span class="math inline">\(\times\)</span> 60 <span class="math inline">\(\times\)</span> 1000 <span class="math inline">\(=\)</span> <code>NA</code>!) so I’m also going to explicitly test for this.</p>
+<p>Add a test to the <code>tests/</code> directory with:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoidXNldGhpczo6dXNlX3Rlc3QoXCJjb252ZXJ0X2JhZ3Nfa2dcIikifQ== -->
+<pre class="r"><code>usethis::use_test(&quot;convert_bags_kg&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>And run the test with <code>devtools::test()</code>:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGV2dG9vbHM6OnRlc3QoKVxuYGBgIn0= -->
+<pre class="r"><code>devtools::test()</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiTG9hZGluZyBSVW5pdFRlc3RpbmdcbkxvYWRpbmcgcmVxdWlyZWQgcGFja2FnZTogdGVzdHRoYXRcblxuQXR0YWNoaW5nIHBhY2thZ2U6IOKAmHRlc3R0aGF04oCZXG5cblRoZSBmb2xsb3dpbmcgb2JqZWN0IGlzIG1hc2tlZCBmcm9tIOKAmHBhY2thZ2U6ZHBseXLigJk6XG5cbiAgICBtYXRjaGVzXG5cblRoZSBmb2xsb3dpbmcgb2JqZWN0IGlzIG1hc2tlZCBmcm9tIOKAmHBhY2thZ2U6cHVycnLigJk6XG5cbiAgICBpc19udWxsXG5cblRlc3RpbmcgUlVuaXRUZXN0aW5nXG4ifQ== -->
+<pre><code>Loading RUnitTesting
+Loading required package: testthat
+
+Attaching package: ‘testthat’
+
+The following object is masked from ‘package:dplyr’:
+
+    matches
+
+The following object is masked from ‘package:purrr’:
+
+    is_null
+
+Testing RUnitTesting</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoi4pyUIHwgT0sgXHUwMDFiWzMxbUZcdTAwMWJbMzltIFx1MDAxYlszNW1XXHUwMDFiWzM5bSBcdTAwMWJbMzRtU1x1MDAxYlszOW0gfCBDb250ZXh0XG5cbuKgjyB8ICAwICAgICAgIHwgdGVzdC1jb252ZXJ0X2JhZ3Nfa2cuUlxu4qCLIHwgIDEgICAgICAgfCB0ZXN0LWNvbnZlcnRfYmFnc19rZy5SXG7ioJkgfCAgMiAgICAgICB8IHRlc3QtY29udmVydF9iYWdzX2tnLlJcblx1MDAxYlszMm3inJRcdTAwMWJbMzltIHwgIDIgICAgICAgfCB0ZXN0LWNvbnZlcnRfYmFnc19rZy5SXG5cbuKVkOKVkCBcdTAwMWJbMW1SZXN1bHRzXHUwMDFiWzIybSDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZBcblx1MDAxYlszNm1EdXJhdGlvbjogMC4yIHNcdTAwMWJbMzltXG5cbk9LOiAgICAgICBcdTAwMWJbMzJtMlx1MDAxYlszOW1cbkZhaWxlZDogICBcdTAwMWJbMzJtMFx1MDAxYlszOW1cbldhcm5pbmdzOiBcdTAwMWJbMzJtMFx1MDAxYlszOW1cblNraXBwZWQ6ICBcdTAwMWJbMzJtMFx1MDAxYlszOW1cbiJ9 -->
+<pre><code>✔ | OK [31mF[39m [35mW[39m [34mS[39m | Context
+
+⠏ |  0       | test-convert_bags_kg.R
+⠋ |  1       | test-convert_bags_kg.R
+⠙ |  2       | test-convert_bags_kg.R
+[32m✔[39m |  2       | test-convert_bags_kg.R
+
+══ [1mResults[22m ═════════════════════════════════════════════════════════════════
+[36mDuration: 0.2 s[39m
+
+OK:       [32m2[39m
+Failed:   [32m0[39m
+Warnings: [32m0[39m
+Skipped:  [32m0[39m</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>The output will tell you which (if any) tests fail and which pass.</p>
+<p>Now we can confidently convert from thousands of 60kg bags to kg in the <code>coffee</code> data set:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29mZmVlIDwtIFxuICBjb2ZmZWUgJT4lIFxuICBtdXRhdGUoa2cgPSBjb252ZXJ0X2JhZ3Nfa2coYDIwMTNgKSkgJT4lIFxuICBzZWxlY3QoY291bnRyeSwga2cpXG5oZWFkKGNvZmZlZSlcbmBgYCJ9 -->
+<pre class="r"><code>coffee &lt;- 
+  coffee %&gt;% 
+  mutate(kg = convert_bags_kg(`2013`)) %&gt;% 
+  select(country, kg)
+head(coffee)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibmNvbCI6MiwibnJvdyI6Nn0sInJkZiI6Ikg0c0lBQUFBQUFBQUExMVJNVTdETUJUOWRkS1dSaXBDUW1MbUFzM0Fpb1JJeXdrcUlYVjFqUk1pWER1eUhVcVpRRnlBQWJGekFDYnVVWEVUbUJrYWJOZEdKWmFTOTkvemMvTCs5L1JpZHBMTUVnQkFFTVVSb01pVU1US3ZEc1F3c0hnSEVCMDZBOENCZVhwK281L1ZTc3NTQnpxbXJDanJoYWQ3NDVvVmVHZDdJZ1hXZjdRM1dWV3lWcDd0VCs0cHVUNmUwcXFlczVKWXhYcXkxN09YQjFOa0grK241eFlmbVFLTHk3ZTF3OHVuVDRmUFg5L2cxci9rWGNLd1VqNTFFSk1yckhHYVM3eWdiVHMzV3JDakVKdUltbXU1OGhUZEZLMVRBeW1XYVRnNXRCYWJ1R21hSHdPYmxya3ZLbDBLYnF6SVRyVGJ5dGFSTGVHSUNINUxwUjRSa2VlVWp1YTRVQ01iQVJMbjJxNmhyM3M3TmRyK09XcjhGN3RoN3BRWEphZWhaWWJubElWTE1KMjRSdEpLbGx5SGVSbFZwVnBvSEh3SkVTd29ya1hZL0FJQ1RzUnRSZ0lBQUE9PSJ9 -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["country"],"name":[1],"type":["chr"],"align":["left"]},{"label":["kg"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"Austria","2":"93300000"},{"1":"Belgium","2":"330120000"},{"1":"Bulgaria","2":"36540000"},{"1":"Croatia","2":"24780000"},{"1":"Cyprus","2":"5640000"},{"1":"Czech Republic","2":"71040000"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>That’s 5.3347210^{9}kg of coffee in 2013, or 2.523610^{8}kg in the UK, of which I myself drank 2.523610^{7}kg.</p>
+<p>Again, the advantage of explicitly writing unit tests is that, if we modify the function and accidentally break its behaviour, the unit tests will alert us. Try it and see!</p>
+<!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiVW5pdCB0ZXN0aW5nIGluIFIiCm91dHB1dDogCiAgaHRtbF9ub3RlYm9vazoKICAgIHRoZW1lOiBmbGF0bHkKICAgIGNzczogaW1hZ2UtYWxpZ24uY3NzCmVkaXRvcl9vcHRpb25zOiAKICBjaHVua19vdXRwdXRfdHlwZTogaW5saW5lCi0tLQoKCiMjIFdoeSB0ZXN0PwoKU2VlIHRoZSBbVGVzdGluZyBjaGFwdGVyIG9mIEFkdmFuY2VkIFJdKGh0dHA6Ly9yLXBrZ3MuaGFkLmNvLm56L3Rlc3RzLmh0bWwpIGZvciBhIGZ1bGwgZGlzY3Vzc2lvbiBvZiB3aHkgd2Ugc2hvdWxkIHRlc3Qgb3VyIG91dHB1dHMsIGJ1dCB0byBzdW1tYXJpc2U6CgotIFRlc3RpbmcgaGVscHMgdXMgZGlzY292ZXIgYnVnczsgd2UgY2FuJ3QgZml4IHdoYXQgd2UgZG9uJ3Qga25vdyBpc24ndCBicm9rZW4uCi0gRmV3ZXIgYnVncyAkXGFwcHJveCQgZ3JlYXRlciBjb25maWRlbmNlIGluIG91ciBjb2RlIGFuZCBvdXRwdXRzCi0gRW5zdXJlIHdlIGRvbid0IGJyZWFrIHNvbWV0aGluZyB3aGVuIHdlIGludHJvZHVjZSBuZXcgY29kZQotIFByZXZlbnQgdGhpcyBqdXN0IGJlZm9yZSBwdWJsaWNhdGlvbjoKCiFbVGVzdGluZyBqdXN0IGJlZm9yZSBwdWJsaWNhdGlvbl0oaW1nL3Rlc3QtaW4tcHJvZHVjdGlvbi5qcGcpCgoKIyMgV2hhdCB0byB0ZXN0PwoKV2Ugc2hvdWxkIGlkZWFsbHkgdGVzdCBhcyBtdWNoIGNvZGUgb3V0cHV0IGFzIGlzIHVzZWZ1bCBhbmQgcG9zc2libGUuCkluIGEgZGF0YSBhbmFseXNpcyBwcm9qZWN0LCB0aGF0IHdpbGwgdXN1YWxseSBib2lsIGRvd24gdG86CgotIERhdGEgcHJlcGFyYXRpb24gc2NyaXB0cywgYW5kCi0gRnVuY3Rpb25zCgpXZSBkb24ndCBuZWVkIHRvIHRlc3QgZXZlcnl0aGluZy4KSW5zdGVhZCwgcHJpb3JpdGlzZSBmdW5jdGlvbnMgYW5kIGNvZGUgYmxvY2tzIHRoYXQgYXJlIG1vcmUgY29tcGxleCwgYXJlIG1vcmUgZnJhZ2lsZSwgb3IgdGhhdCBkZXBlbmQgb24gb3IgZmVlZCBpbnRvIG90aGVyIGJsb2NrcyBvZiBjb2RlLgpCdXQsIGJlIGNhcmVmdWwgbm90IHRvIGFzc3VtZSB0aGUgb3V0cHV0IG9mIGEgYmxvY2sgb2YgY29kZSBpcyBvYnZpb3VzOgoKYGBge3IgdmVjdG9yLXRlc3R9CnggPC0gMTo1CmF0dHIoeCwgImxhYmVsIikgPC0gbGV0dGVyc1sxOjVdCmlzLnZlY3Rvcih4KQpgYGAKCkJ5IHdheSBvZiBleHBsYW5hdGlvbiwgYGlzLnZlY3RvcigpYCBvbmx5IHJldHVybnMgYFRSVUVgIGlmIHRoZSBvYmplY3QgaXMgYSB2ZWN0b3IgYW5kIGhhcyBubyBhdHRyaWJ1dGVzIGFwYXJ0IGZyb20gYG5hbWVzYCAoaHR0cDovL2Fkdi1yLmhhZC5jby5uei9EYXRhLXN0cnVjdHVyZXMuaHRtbCN2ZWN0b3JzKQoKCiMjIERhdGEgYW5hbHlzaXMgc2NyaXB0cyAtIHRlc3RpbmcgaW5saW5lCgpGb3IgZGF0YSBhbmFseXNpcyBzY3JpcHRzIEkgcmVjb21tZW5kIHlvdSBhZGQgY2hlY2tzIHRvIHlvdXIgc2NyaXB0IGFzIHlvdSBnbyBhbG9uZy4KWW91J3JlIHByb2JhYmx5IGFscmVhZHkgY2hlY2tpbmcgeW91ciByZXN1bHRzIHNvIGl0J3Mgb2Z0ZW4ganVzdCBhIGNhc2Ugb2Ygd3JpdGluZyB0aGUgdGVzdHMgZXhwbGljaXRseSBpbiB5b3VyIHNjcmlwdCByYXRoZXIgdGhhbiB0ZXN0aW5nIGludGVyYWN0aXZlbHkuCgpJIGZpbmQgdGVzdHMgYXJlIG1vc3QgdXNlZnVsIHdoZW4gSSdtIGRvaW5nIHNvbWV0aGluZyB0aGF0IGNvdWxkIGNoYW5nZSB0aGUgZGF0YSB3aXRob3V0IG1lIHJlYWxpc2luZywgc3VjaCBhczoKCi0gQW55IGpvaW5zIG9yIG1lcmdlcyAtIEFMV0FZUyBjaGVjayB5b3UgaGF2ZSB0aGUgcmlnaHQgbnVtYmVyIG9mIGNhc2VzIQotIFdoZXJlIHlvdSBjaGFuZ2UgdGhlIHR5cGUgb2YgYW4gb2JqZWN0LCBlc3BlY2lhbGx5IHdoZW4gZ29pbmcgZnJvbSBjaGFyYWN0ZXIgdG8gbnVtZXJpYywgb3IgbnVtZXJpYyB0byBsb2dpY2FsLgotIFdoZXJlIGBOQWBzIG1pZ2h0IGJlIGludHJvZHVjZWQsIHN1Y2ggYXMgYSBgZnVsbF9qb2luKClgLiBgYXNzZXJ0dGhhdDo6bm9OQSgpYCBpcyB1c2VmdWwgZm9yIHRoaXMuCi0gV2hlbiBkZWFsaW5nIHdpdGggZmFjdG9ycywgZXNwZWNpYWxseSB3aXRoIG51bWJlcnMgYXMgZmFjdG9yIGxldmVscyAoaXMgaXQgYDEuMGAsIG9yIGlzIGl0IGZhY3RvciBsZXZlbCBgMWA/KS4KClRoZSBleGFtcGxlIHRlc3RzIGhlcmUgYXJlIHJlbGF0aXZlbHkgdHJpdmlhbCwgYnV0IGFyZSBvbmx5IGRlc2lnbmVkIHRvIHNob3cgeW91IGhvdyB0byB0ZXN0LCBub3QgKndoYXQqIHRvIHRlc3QuCkxldCdzIGxvYWQgdGhlIHBhY2thZ2VzIHdlIG5lZWQgYW5kIHNhdmUgc29tZSBkYXRhIHRvIGEgdGVtcG9yYXJ5IGRpcmVjdG9yeSBkZW1vbnN0cmF0ZS4KVGhlIGRhdGEgaXMgdmVyeSBjbG9zZSB0byBteSBoZWFydCBhbmQgaXMgYXZhaWxhYmxlIGZyb20gdGhlIFtJbnRlcm5hdGlvbmFsIENvZmZlZSBPcmdhbml6YXRpb25dKGh0dHA6Ly93d3cuaWNvLm9yZy9uZXdfaGlzdG9yaWNhbC5hc3ApOgoKYGBge3IgcGFja2FnZXMsIGVjaG89RkFMU0UsIGluY2x1ZGU9VFJVRX0KbGlicmFyeSgidGlkeXZlcnNlIikKbGlicmFyeSgic3RyaW5nciIpCmxpYnJhcnkoImFzc2VydHRoYXQiKQpgYGAKCmBgYHtyIGRvd25sb2FkLWRhdGF9CnRlbXBfZGlyIDwtIHRlbXBkaXIoKQp0ZW1wIDwtIHRlbXBmaWxlKHRtcGRpciA9IHRlbXBfZGlyLCBmaWxlZXh0ID0gIi54bHN4IikKZG93bmxvYWQuZmlsZSgKICAiaHR0cDovL3d3dy5pY28ub3JnL2hpc3RvcmljYWwvMTk5MCUyMG9ud2FyZHMvRXhjZWwvMmIlMjAtJTIwSW1wb3J0cy54bHN4IiwKICBkZXN0ZmlsZSA9IHRlbXAKKQpgYGAKCmBgYHtyIGNvZmZlZS1za2lwfQpjb2ZmZWUgPC0gCiAgcmVhZHhsOjpyZWFkX3hsc3godGVtcCwgc2tpcCA9IDMpICU+JSAKICByZW5hbWUoY291bnRyeSA9ICJDYWxlbmRhciB5ZWFycyIpICU+JSAKICBzZWxlY3QoY291bnRyeSwgYDIwMTNgKQpoZWFkKGNvZmZlZSkKYGBgCgpZb3UgY2FuIG5vIGRvdWJ0IHNlZSBhIG51bWJlciBvZiBwcm9ibGVtcywgYnV0IGxldHMgc2VlIGlmIHdlIGNhbiBwaWNrIHRoaXMgdXAgd2l0aCB0ZXN0aW5nLgpXZSBjYW4gdXNlIGJhc2UncyBgc3RvcGlmbm90KClgIG9yIHRoZSBgYXNzZXJ0dGhhdGAgcGFja2FnZSBmb3IgdGVzdHMuCkJvdGggZG8gZXNzZW50aWFsbHkgdGhlIHNhbWUgdGhpbmcsIGJ1dCB5b3UgY2FuIGFkZCBhIGN1c3RvbWlzZWQgZXJyb3IgbWVzc2FnZSB3aXRoIGBhc3NlcnR0aGF0Ojphc3NlcnRfdGhhdCgpYCB3aGljaCBpcyBzb21ldGltZXMgdXNlZnVsLgoKRmlyc3QgSSB3YW50IHRvIG1ha2Ugc3VyZSB0aGVyZSBhcmVuJ3QgYW55IGJsYW5rIHJvd3M6CgpgYGB7ciB0ZXN0LWJsYW5rLXJvd30KYXNzZXJ0dGhhdDo6bm9OQShjb2ZmZWUkY291bnRyeSkKYGBgCgpPbiBzZWVpbmcgdGhpcyBJIHdvdWxkIGFtZW5kIG15IHNjcmlwdCBhbmQsIHdoZW4gcmUtcnVuLCBob3BlZnVsbHkgdGhlIHRlc3Qgd2lsbCBwYXNzOgoKYGBge3IgZml4LWJsYW5rLXJvd3N9CmNvZmZlZSA8LSAKICByZWFkeGw6OnJlYWRfeGxzeCh0ZW1wLCBza2lwID0gMykgJT4lIAogIHJlbmFtZShjb3VudHJ5ID0gIkNhbGVuZGFyIHllYXJzIikgJT4lIAogIHNlbGVjdChjb3VudHJ5LCBgMjAxM2ApICU+JSAKICBmaWx0ZXIoIWlzLm5hKGNvdW50cnkpKQoKYXNzZXJ0dGhhdDo6bm9OQShjb2ZmZWUkY291bnRyeSkKYGBgCgpOZXh0LCBJIGtub3cgZnJvbSBvcGVuaW5nIHRoZSBFeGNlbCBmaWxlIHRoZXJlIGFyZSAzNCBjb3VudHJpZXMgd2l0aCBkYXRhLCBzbyBsZXRzIGNoZWNrOgoKYGBge3IgdGVzdC1uLWNvdW50cmllc30KYXNzZXJ0dGhhdDo6YXJlX2VxdWFsKG5yb3coY29mZmVlKSwgMzRMKSAgIyAnTCcgaXMgZm9yIGludGVnZXIsIG9idmlvdXNseQpgYGAKClRoaXMgdGVzdCBmYWlscyBiZWNhdXNlIHRoZXJlIGFyZSBhIG51bWJlciBvZiBvYnNlcnZhdGlvbnMgdGhhdCBhcmVuJ3QgY291bnRpZXMsIHN1Y2ggYXMgdGhlIEV1cm9wZWFuIFVuaW9uLCBhIGBUb3RhbGAsIGFuZCB0aGUgY29weXJpZ2h0IGluZm9ybWF0aW9uIGZvciB0aGUgZGF0YS4KVGhlcmUncyBhbHNvIGEgJ2BCZWxnaXVtL0x1eGVtYm91cmdgJyByb3cgd2hlcmUgdGhlIGRhdGEgZm9yIHRoZXNlIGNvdW50cmllcyB3YXMgY29tYmluZWQgaW4gZWFybGllciB5ZWFycy4KTGV0cyByZW1vdmUgdGhlc2UgYW5kIHJlLXRlc3QgKGZpcnN0IEknbSBnb2luZyB0byBzYXZlIHRoZSB0b3RhbCBmb3IgYSBsYXRlciB0ZXN0KToKCmBgYHtyIGZpeC1uLWNvdW50cmllc30KY29mZmVlX3RvdGFsIDwtIAogIGNvZmZlZSAlPiUgCiAgZmlsdGVyKGNvdW50cnkgPT0gIlRvdGFsIikgJT4lIAogIHNlbGVjdChgMjAxM2ApICU+JSAKICBhcy5udW1lcmljKC4pCgpjb2ZmZWUgPC0gCiAgcmVhZHhsOjpyZWFkX3hsc3godGVtcCwgc2tpcCA9IDMpICU+JSAKICByZW5hbWUoY291bnRyeSA9ICJDYWxlbmRhciB5ZWFycyIpICU+JSAKICBzZWxlY3QoY291bnRyeSwgYDIwMTNgKSAlPiUgCiAgZmlsdGVyKCFpcy5uYShjb3VudHJ5KSkgJT4lIAogIGZpbHRlcigKICAgIGNvdW50cnkgIT0gIkV1cm9wZWFuIFVuaW9uIiwKICAgIGNvdW50cnkgIT0gIlRvdGFsIiwKICAgICFzdHJfZGV0ZWN0KGNvdW50cnksICJJbnRlcm5hdGlvbmFsIENvZmZlZSBPcmdhbml6YXRpb24iKSwKICAgIGNvdW50cnkgIT0gIkJlbGdpdW0vTHV4ZW1ib3VyZyIKICApCgphc3NlcnR0aGF0OjphcmVfZXF1YWwobnJvdyhjb2ZmZWUpLCAzNEwpCmBgYAoKQW5vdGhlciBwcm9ibGVtIGZpeGVkLgpOb3csIGxldHMgc2VlIGlmIGV2ZXJ5dGhpbmcgYWRkcyB1cCBjb3JyZWN0bHk6CgpgYGB7ciB0ZXN0LXN1bX0KYXNzZXJ0dGhhdDo6YXJlX2VxdWFsKAogIHN1bShjb2ZmZWUkYDIwMTNgKSwgY29mZmVlX3RvdGFsCikKYGBgCgpTbywgbm8uCkJ1dCwgdGhlIGRpZmZlcmVuY2UgaXMgcHJldHR5IHNtYWxsIHNvIGl0J3MgbGlrZWx5IHRvIGJlIGEgcm91bmRpbmcgZXJyb3IuCldlIGNhbiBjaGFuZ2UgdGhlIHRvbGVyYW5jZSBvZiB0aGUgdGVzdCB0byBtYWtlIGl0IHBhc3MgaW4gdGhpcyBjYXNlLgpUaGlzIG1lYW5zIHdlIGNhbiBzdGlsbCBpbmNsdWRlIHRoZSB0ZXN0IGFuZCwgaWYgd2UgZGlkIHNvbWV0aGluZyBkcmFzdGljIHRvIHRoZSBkYXRhIChsaWtlIGRyb3AgdGhlIFVTQSBieSBtaXN0YWtlKSB3ZSdkIHN0aWxsIG5vdGljZToKCmBgYHtyIHRlc3Qtc3VtLXRvbGVyYW5jZX0KYXNzZXJ0dGhhdDo6YXJlX2VxdWFsKAogIHN1bShjb2ZmZWUkYDIwMTNgKSwgY29mZmVlX3RvdGFsLAogIHRvbCA9IDEwCikKYGBgCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiVW5pdCB0ZXN0aW5nIGluIFIiCm91dHB1dDogCiAgaHRtbF9ub3RlYm9vazoKICAgIHRoZW1lOiBmbGF0bHkKICAgIGNzczogaW1hZ2UtYWxpZ24uY3NzCmVkaXRvcl9vcHRpb25zOiAKICBjaHVua19vdXRwdXRfdHlwZTogaW5saW5lCi0tLQoKCiMjIFdoeSB0ZXN0PwoKU2VlIHRoZSBbVGVzdGluZyBjaGFwdGVyIG9mIEFkdmFuY2VkIFJdKGh0dHA6Ly9yLXBrZ3MuaGFkLmNvLm56L3Rlc3RzLmh0bWwpIGZvciBhIGZ1bGwgZGlzY3Vzc2lvbiBvZiB3aHkgd2Ugc2hvdWxkIHRlc3Qgb3VyIG91dHB1dHMsIGJ1dCB0byBzdW1tYXJpc2U6CgotIFRlc3RpbmcgaGVscHMgdXMgZGlzY292ZXIgYnVnczsgd2UgY2FuJ3QgZml4IHdoYXQgd2UgZG9uJ3Qga25vdyBpc24ndCBicm9rZW4uCi0gRmV3ZXIgYnVncyAkXGFwcHJveCQgZ3JlYXRlciBjb25maWRlbmNlIGluIG91ciBjb2RlIGFuZCBvdXRwdXRzCi0gRW5zdXJlIHdlIGRvbid0IGJyZWFrIHNvbWV0aGluZyB3aGVuIHdlIGludHJvZHVjZSBuZXcgY29kZQotIFByZXZlbnQgdGhpcyBqdXN0IGJlZm9yZSBwdWJsaWNhdGlvbjoKCiFbVGVzdGluZyBqdXN0IGJlZm9yZSBwdWJsaWNhdGlvbl0oaW1nL3Rlc3QtaW4tcHJvZHVjdGlvbi5qcGcpCgoKIyMgV2hhdCB0byB0ZXN0PwoKV2Ugc2hvdWxkIGlkZWFsbHkgdGVzdCBhcyBtdWNoIGNvZGUgb3V0cHV0IGFzIGlzIHVzZWZ1bCBhbmQgcG9zc2libGUuCkluIGEgZGF0YSBhbmFseXNpcyBwcm9qZWN0LCB0aGF0IHdpbGwgdXN1YWxseSBib2lsIGRvd24gdG86CgotIERhdGEgcHJlcGFyYXRpb24gc2NyaXB0cywgYW5kCi0gRnVuY3Rpb25zCgpXZSBkb24ndCBuZWVkIHRvIHRlc3QgZXZlcnl0aGluZy4KSW5zdGVhZCwgcHJpb3JpdGlzZSBmdW5jdGlvbnMgYW5kIGNvZGUgYmxvY2tzIHRoYXQgYXJlIG1vcmUgY29tcGxleCwgYXJlIG1vcmUgZnJhZ2lsZSwgb3IgdGhhdCBkZXBlbmQgb24gb3IgZmVlZCBpbnRvIG90aGVyIGJsb2NrcyBvZiBjb2RlLgpCdXQsIGJlIGNhcmVmdWwgbm90IHRvIGFzc3VtZSB0aGUgb3V0cHV0IG9mIGEgYmxvY2sgb2YgY29kZSBpcyBvYnZpb3VzOgoKYGBge3IgdmVjdG9yLXRlc3R9CnggPC0gMTo1CmF0dHIoeCwgImxhYmVsIikgPC0gbGV0dGVyc1sxOjVdCmlzLnZlY3Rvcih4KQpgYGAKCkJ5IHdheSBvZiBleHBsYW5hdGlvbiwgYGlzLnZlY3RvcigpYCBvbmx5IHJldHVybnMgYFRSVUVgIGlmIHRoZSBvYmplY3QgaXMgYSB2ZWN0b3IgYW5kIGhhcyBubyBhdHRyaWJ1dGVzIGFwYXJ0IGZyb20gYG5hbWVzYCAoaHR0cDovL2Fkdi1yLmhhZC5jby5uei9EYXRhLXN0cnVjdHVyZXMuaHRtbCN2ZWN0b3JzKQoKCiMjIERhdGEgYW5hbHlzaXMgc2NyaXB0cyAtIHRlc3RpbmcgaW5saW5lCgpGb3IgZGF0YSBhbmFseXNpcyBzY3JpcHRzIEkgcmVjb21tZW5kIHlvdSBhZGQgY2hlY2tzIHRvIHlvdXIgc2NyaXB0IGFzIHlvdSBnbyBhbG9uZy4KWW91J3JlIHByb2JhYmx5IGFscmVhZHkgY2hlY2tpbmcgeW91ciByZXN1bHRzIHNvIGl0J3Mgb2Z0ZW4ganVzdCBhIGNhc2Ugb2Ygd3JpdGluZyB0aGUgdGVzdHMgZXhwbGljaXRseSBpbiB5b3VyIHNjcmlwdCByYXRoZXIgdGhhbiB0ZXN0aW5nIGludGVyYWN0aXZlbHkuCgpJIGZpbmQgdGVzdHMgYXJlIG1vc3QgdXNlZnVsIHdoZW4gSSdtIGRvaW5nIHNvbWV0aGluZyB0aGF0IGNvdWxkIGNoYW5nZSB0aGUgZGF0YSB3aXRob3V0IG1lIHJlYWxpc2luZywgc3VjaCBhczoKCi0gQW55IGpvaW5zIG9yIG1lcmdlcyAtIEFMV0FZUyBjaGVjayB5b3UgaGF2ZSB0aGUgcmlnaHQgbnVtYmVyIG9mIGNhc2VzIQotIFdoZXJlIHlvdSBjaGFuZ2UgdGhlIHR5cGUgb2YgYW4gb2JqZWN0LCBlc3BlY2lhbGx5IHdoZW4gZ29pbmcgZnJvbSBjaGFyYWN0ZXIgdG8gbnVtZXJpYywgb3IgbnVtZXJpYyB0byBsb2dpY2FsLgotIFdoZXJlIGBOQWBzIG1pZ2h0IGJlIGludHJvZHVjZWQsIHN1Y2ggYXMgYSBgZnVsbF9qb2luKClgLiBgYXNzZXJ0dGhhdDo6bm9OQSgpYCBpcyB1c2VmdWwgZm9yIHRoaXMuCi0gV2hlbiBkZWFsaW5nIHdpdGggZmFjdG9ycywgZXNwZWNpYWxseSB3aXRoIG51bWJlcnMgYXMgZmFjdG9yIGxldmVscyAoaXMgaXQgYDEuMGAsIG9yIGlzIGl0IGZhY3RvciBsZXZlbCBgMWA/KS4KClRoZSBleGFtcGxlIHRlc3RzIGhlcmUgYXJlIHJlbGF0aXZlbHkgdHJpdmlhbCwgYnV0IGFyZSBvbmx5IGRlc2lnbmVkIHRvIHNob3cgeW91IGhvdyB0byB0ZXN0LCBub3QgKndoYXQqIHRvIHRlc3QuCkxldCdzIGxvYWQgdGhlIHBhY2thZ2VzIHdlIG5lZWQgYW5kIHNhdmUgc29tZSBkYXRhIHRvIGEgdGVtcG9yYXJ5IGRpcmVjdG9yeSBkZW1vbnN0cmF0ZS4KVGhlIGRhdGEgaXMgdmVyeSBjbG9zZSB0byBteSBoZWFydCBhbmQgaXMgYXZhaWxhYmxlIGZyb20gdGhlIFtJbnRlcm5hdGlvbmFsIENvZmZlZSBPcmdhbml6YXRpb25dKGh0dHA6Ly93d3cuaWNvLm9yZy9uZXdfaGlzdG9yaWNhbC5hc3ApOgoKYGBge3IgcGFja2FnZXMsIGVjaG89VFJVRSwgaW5jbHVkZT1UUlVFfQpzdXBwcmVzc01lc3NhZ2VzKGxpYnJhcnkoInRpZHl2ZXJzZSIpKQpsaWJyYXJ5KCJzdHJpbmdyIikKbGlicmFyeSgiYXNzZXJ0dGhhdCIpCmBgYAoKYGBge3IgZG93bmxvYWQtZGF0YX0KdGVtcF9kaXIgPC0gdGVtcGRpcigpCnRlbXAgPC0gdGVtcGZpbGUodG1wZGlyID0gdGVtcF9kaXIsIGZpbGVleHQgPSAiLnhsc3giKQpkb3dubG9hZC5maWxlKAogICJodHRwOi8vd3d3Lmljby5vcmcvaGlzdG9yaWNhbC8xOTkwJTIwb253YXJkcy9FeGNlbC8yYiUyMC0lMjBJbXBvcnRzLnhsc3giLAogIGRlc3RmaWxlID0gdGVtcAopCmBgYAoKYGBge3IgY29mZmVlLXNraXB9CmNvZmZlZSA8LSAKICByZWFkeGw6OnJlYWRfeGxzeCh0ZW1wLCBza2lwID0gMykgJT4lIAogIHJlbmFtZShjb3VudHJ5ID0gIkNhbGVuZGFyIHllYXJzIikgJT4lIAogIHNlbGVjdChjb3VudHJ5LCBgMjAxM2ApCmhlYWQoY29mZmVlKQpgYGAKCllvdSBjYW4gbm8gZG91YnQgc2VlIGEgbnVtYmVyIG9mIHByb2JsZW1zLCBidXQgbGV0cyBzZWUgaWYgd2UgY2FuIHBpY2sgdGhpcyB1cCB3aXRoIHRlc3RpbmcuCldlIGNhbiB1c2UgYmFzZSdzIGBzdG9waWZub3QoKWAgb3IgdGhlIGBhc3NlcnR0aGF0YCBwYWNrYWdlIGZvciB0ZXN0cy4KQm90aCBkbyBlc3NlbnRpYWxseSB0aGUgc2FtZSB0aGluZywgYnV0IHlvdSBjYW4gYWRkIGEgY3VzdG9taXNlZCBlcnJvciBtZXNzYWdlIHdpdGggYGFzc2VydHRoYXQ6OmFzc2VydF90aGF0KClgIHdoaWNoIGlzIHNvbWV0aW1lcyB1c2VmdWwuCgpGaXJzdCBJIHdhbnQgdG8gbWFrZSBzdXJlIHRoZXJlIGFyZW4ndCBhbnkgYmxhbmsgcm93czoKCmBgYHtyIHRlc3QtYmxhbmstcm93fQphc3NlcnR0aGF0Ojpub05BKGNvZmZlZSRjb3VudHJ5KQpgYGAKCk9uIHNlZWluZyB0aGlzIEkgd291bGQgYW1lbmQgbXkgc2NyaXB0IGFuZCwgd2hlbiByZS1ydW4sIGhvcGVmdWxseSB0aGUgdGVzdCB3aWxsIHBhc3M6CgpgYGB7ciBmaXgtYmxhbmstcm93c30KY29mZmVlIDwtIAogIHJlYWR4bDo6cmVhZF94bHN4KHRlbXAsIHNraXAgPSAzKSAlPiUgCiAgcmVuYW1lKGNvdW50cnkgPSAiQ2FsZW5kYXIgeWVhcnMiKSAlPiUgCiAgc2VsZWN0KGNvdW50cnksIGAyMDEzYCkgJT4lIAogIGZpbHRlcighaXMubmEoY291bnRyeSkpCgphc3NlcnR0aGF0Ojpub05BKGNvZmZlZSRjb3VudHJ5KQpgYGAKCk5leHQsIEkga25vdyBmcm9tIG9wZW5pbmcgdGhlIEV4Y2VsIGZpbGUgdGhlcmUgYXJlIDM0IGNvdW50cmllcyB3aXRoIGRhdGEsIHNvIGxldHMgY2hlY2s6CgpgYGB7ciB0ZXN0LW4tY291bnRyaWVzfQphc3NlcnR0aGF0OjphcmVfZXF1YWwobnJvdyhjb2ZmZWUpLCAzNEwpICAjICdMJyBpcyBmb3IgaW50ZWdlciwgb2J2aW91c2x5CmBgYAoKVGhpcyB0ZXN0IGZhaWxzIGJlY2F1c2UgdGhlcmUgYXJlIGEgbnVtYmVyIG9mIG9ic2VydmF0aW9ucyB0aGF0IGFyZW4ndCBjb3VudGllcywgc3VjaCBhcyB0aGUgRXVyb3BlYW4gVW5pb24sIGEgYFRvdGFsYCwgYW5kIHRoZSBjb3B5cmlnaHQgaW5mb3JtYXRpb24gZm9yIHRoZSBkYXRhLgpUaGVyZSdzIGFsc28gYSAnYEJlbGdpdW0vTHV4ZW1ib3VyZ2AnIHJvdyB3aGVyZSB0aGUgZGF0YSBmb3IgdGhlc2UgY291bnRyaWVzIHdhcyBjb21iaW5lZCBpbiBlYXJsaWVyIHllYXJzLgpMZXRzIHJlbW92ZSB0aGVzZSBhbmQgcmUtdGVzdDoKCmBgYHtyIGZpeC1uLWNvdW50cmllc30KY29mZmVlIDwtIAogIHJlYWR4bDo6cmVhZF94bHN4KHRlbXAsIHNraXAgPSAzKSAlPiUgCiAgcmVuYW1lKGNvdW50cnkgPSAiQ2FsZW5kYXIgeWVhcnMiKSAlPiUgCiAgc2VsZWN0KGNvdW50cnksIGAyMDEzYCkgJT4lIAogIGZpbHRlcighaXMubmEoY291bnRyeSkpICU+JSAKICBmaWx0ZXIoCiAgICBjb3VudHJ5ICE9ICJFdXJvcGVhbiBVbmlvbiIsCiAgICBjb3VudHJ5ICE9ICJUb3RhbCIsCiAgICAhc3RyX2RldGVjdChjb3VudHJ5LCAiSW50ZXJuYXRpb25hbCBDb2ZmZWUgT3JnYW5pemF0aW9uIiksCiAgICBjb3VudHJ5ICE9ICJCZWxnaXVtL0x1eGVtYm91cmciCiAgKQoKYXNzZXJ0dGhhdDo6YXJlX2VxdWFsKG5yb3coY29mZmVlKSwgMzRMKQpgYGAKCkFub3RoZXIgcHJvYmxlbSBmaXhlZC4KTm93IHdlIGhhdmUgb3VyIHNjcmlwdCB0byBwcmVwYXJlIHRoZSBkYXRhIGFuZCBvdXIgdGVzdHMgdG8gbWFrZSBzdXJlIGl0J3Mgd29ya2luZyBhcyBpbnRlbmRlZC4KVGhleSBzaG91bGQgbG9vayBzb21ldGhpbmcgbGlrZSB0aGlzIG5vdzoKCmBgYHtyIGNvZmZlZS1maW5hbH0KY29mZmVlIDwtIAogIHJlYWR4bDo6cmVhZF94bHN4KHRlbXAsIHNraXAgPSAzKSAlPiUgCiAgcmVuYW1lKGNvdW50cnkgPSAiQ2FsZW5kYXIgeWVhcnMiKSAlPiUgCiAgc2VsZWN0KGNvdW50cnksIGAyMDEzYCkgJT4lIAogIGZpbHRlcighaXMubmEoY291bnRyeSkpICU+JSAKICBmaWx0ZXIoCiAgICBjb3VudHJ5ICE9ICJFdXJvcGVhbiBVbmlvbiIsCiAgICBjb3VudHJ5ICE9ICJUb3RhbCIsCiAgICAhc3RyX2RldGVjdChjb3VudHJ5LCAiSW50ZXJuYXRpb25hbCBDb2ZmZWUgT3JnYW5pemF0aW9uIiksCiAgICBjb3VudHJ5ICE9ICJCZWxnaXVtL0x1eGVtYm91cmciCiAgKQoKYXNzZXJ0dGhhdDo6bm9OQShjb2ZmZWUkY291bnRyeSkKYXNzZXJ0dGhhdDo6bm9OQShjb2ZmZWUkYDIwMTNgKQphc3NlcnR0aGF0OjphcmVfZXF1YWwobnJvdyhjb2ZmZWUpLCAzNEwpCmBgYAoKT25lIG9mIHRoZSBhZHZhbnRhZ2VzIG9mIGhhdmluZyBzcGVjaWZpZWQgb3VyIHRlc3RzIGlzIHRoYXQgaWYgd2UgZ28gYmFjayBhbmQgY2hhbmdlIHNvbWV0aGluZyBpbiBvdXIgc2NyaXB0IGFuZCBhY2NpZGVudGFsbHkgYnJlYWsgc29tZXRoaW5nLCB0aGUgdGVzdHMgd2lsbCBhbGVydCB1cy4KSW1hZ2luZSB3ZSBhY2NpZGVudGFsbHkgcmVtb3ZlIG9uZSBvZiB0aGUgY291bnRyaWVzOgoKYGBge3IgY29mZmVlLXJlbW92ZS1jb3VudHJ5fQpjb2ZmZWUgPC0gY29mZmVlWzE6MzMsIF0gICMgb29wcywgd2UgbWVhbnQgMzQgKG9yIGV2ZW4gYmV0dGVyIG5yb3coY29mZmVlKSEpCmBgYAoKTm93IHRoZSB0ZXN0cyB3aWxsIGZhaWwgYWxlcnRpbmcgdXMgdG8gdGhlIGlzc3VlOgoKYGBge3IgY29mZmVlLXRlc3QtcmVtb3ZlLWNvdW50cnl9CmFzc2VydHRoYXQ6Om5vTkEoY29mZmVlJGNvdW50cnkpCmFzc2VydHRoYXQ6Om5vTkEoY29mZmVlJGAyMDEzYCkKYXNzZXJ0dGhhdDo6YXJlX2VxdWFsKG5yb3coY29mZmVlKSwgMzRMKQpgYGAKCgojIyBUZXN0aW5nIGZ1bmN0aW9ucwoKVGhlIG90aGVyIHRoaW5ncyB5b3Ugc2hvdWxkIHRlc3QgYXJlIGZ1bmN0aW9ucy4KRnVuY3Rpb25zIGFyZSB1c2VmdWwgdG8gcGVyZm9ybSB0aGUgc2FtZSBwcm9jZWR1cmUgb24gbXVsdGlwbGUgb2JqZWN0cy4KSW1hZ2luZSB3ZSB3YW50IHRvIGNvbnZlcnQgdGhlIHVuaXRzIGluIG91ciBgY29mZmVlYCB0YWJsZSBmcm9tIGl0cyBjdXJyZW50ICd0aG91c2FuZHMgb2YgNjBrZyBiYWdzJyB0byBzaW1wbHkga2cuCk9yZGluYXJpbHkgaW4gUiB3ZSdkIGp1c3QgZG8gdGhpcyBhcyBhIHZlY3RvciBvcGVyYXRpb24sIGJ1dCBsZXRzIHdyaXRlIGEgZnVuY3Rpb24gdG8gaWxsdXN0cmF0ZSB0aGUgcG9pbnQuCkNyZWF0ZSB0aGUgZnVuY3Rpb24gaW4gYFIvYCB3aGljaCB3ZSBjYW4gZG8gYXV0b21hdGljYWxseSB3aXRoIGB1c2V0aGlzYDoKCmBgYHtyIGNyZWF0ZS1mdW5jdGlvbi1maWxlLCBldmFsPUZBTFNFfQp1c2V0aGlzOjp1c2VfcigiY29udmVydC11bml0IikKYGBgCgpUaGUgZnVuY3Rpb24gaXRzZWxmIHNob3VsZCB0YWtlIGEgbnVtYmVyLCBtdWx0aXBseSBpdCBieSA2MCwgYW5kIG11bHRpcGx5IGl0IGJ5IDEwMDA6CgpgYGB7ciBjb252ZXJ0LWJhZ3MtdG8ta2ctZnVuY3Rpb24sIGV2YWw9RkFMU0V9CmNvbnZlcnRfYmFnc19rZyA8LSBmdW5jdGlvbihiYWdzKSB7CiAga2cgPSBiYWdzICogNjAgKiAxMDAwCiAga2cKfQpgYGAKCllvdSBjYW4gbG9hZCBmdW5jdGlvbnMgaW4gYFIvYCBmaWxlcyB3aXRoIGBkZXZ0b29sczo6bG9hZF9hbGwoKWAuCgpgYGB7ciBsb2FkLWZ1bmN0aW9ufQpkZXZ0b29sczo6bG9hZF9hbGwoKQpgYGAKCkJlZm9yZSB3ZSB1c2UgdGhlIGZ1bmN0aW9uLCBsZXRzIHRlc3QgaXQgYW5kIG1ha2Ugc3VyZSBpdCBwcm9kdWNlcyB0aGUgY29ycmVjdCBvdXRwdXQuCkkgd291bGQgZXhwZWN0IDUwIHVuaXRzIGluIHRoZSBjb2ZmZWUgdGFibGUgdG8gYmUgZXF1aXZhbGVudCB0byAoNTAgJFx0aW1lcyQgNjAgJFx0aW1lcyQgMTAwMCAkPSQpIDMsMDAwLDAwMGtnLgpJIHdvdWxkIGFsc28gZXhwZWN0IHRoYXQgaWYgdGhlIGZ1bmN0aW9uIGVuY291bnRlcmVkIGFuIGBOQWAgaXQgd291bGQgcmV0dXJuIGFuIGBOQWAgKGBOQWAgJFx0aW1lcyQgNjAgJFx0aW1lcyQgMTAwMCAkPSQgYE5BYCEpIHNvIEknbSBhbHNvIGdvaW5nIHRvIGV4cGxpY2l0bHkgdGVzdCBmb3IgdGhpcy4KCkFkZCBhIHRlc3QgdG8gdGhlIGB0ZXN0cy9gIGRpcmVjdG9yeSB3aXRoOgoKYGBge3Igd3JpdGUtdGVzdC1mdW5jdGlvbiwgZXZhbD1GQUxTRX0KdXNldGhpczo6dXNlX3Rlc3QoImNvbnZlcnRfYmFnc19rZyIpCmBgYAoKQW5kIHJ1biB0aGUgdGVzdCB3aXRoIGBkZXZ0b29sczo6dGVzdCgpYDoKCmBgYHtyIHJ1bi10ZXN0fQpkZXZ0b29sczo6dGVzdCgpCmBgYAoKVGhlIG91dHB1dCB3aWxsIHRlbGwgeW91IHdoaWNoIChpZiBhbnkpIHRlc3RzIGZhaWwgYW5kIHdoaWNoIHBhc3MuCgpOb3cgd2UgY2FuIGNvbmZpZGVudGx5IGNvbnZlcnQgZnJvbSB0aG91c2FuZHMgb2YgNjBrZyBiYWdzIHRvIGtnIGluIHRoZSBgY29mZmVlYCBkYXRhIHNldDoKCmBgYHtyIGNvbnZlcnQtY29mZmVlLWJhZ3Mta2d9CmNvZmZlZSA8LSAKICBjb2ZmZWUgJT4lIAogIG11dGF0ZShrZyA9IGNvbnZlcnRfYmFnc19rZyhgMjAxM2ApKSAlPiUgCiAgc2VsZWN0KGNvdW50cnksIGtnKQoKaGVhZChjb2ZmZWUpCmBgYAoKVGhhdCdzIGByIHN1bShjb2ZmZWUka2cpYGtnIG9mIGNvZmZlZSBpbiAyMDEzLCBvciBgciBjb2ZmZWUka2dbY29mZmVlJGNvdW50cnkgPT0gIlVuaXRlZCBLaW5nZG9tIl1ga2cgaW4gdGhlIFVLLCBvZiB3aGljaCBJIG15c2VsZiBkcmFuayBgciBjb2ZmZWUka2dbY29mZmVlJGNvdW50cnkgPT0gIlVuaXRlZCBLaW5nZG9tIl0gLyAxMGBrZy4KCkFnYWluLCB0aGUgYWR2YW50YWdlIG9mIGV4cGxpY2l0bHkgd3JpdGluZyB1bml0IHRlc3RzIGlzIHRoYXQsIGlmIHdlIG1vZGlmeSB0aGUgZnVuY3Rpb24gYW5kIGFjY2lkZW50YWxseSBicmVhayBpdHMgYmVoYXZpb3VyLCB0aGUgdW5pdCB0ZXN0cyB3aWxsIGFsZXJ0IHVzLgpUcnkgaXQgYW5kIHNlZSEK</div>
 
 
 

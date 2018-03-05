@@ -58,8 +58,8 @@ The example tests here are relatively trivial, but are only designed to show you
 Let's load the packages we need and save some data to a temporary directory demonstrate.
 The data is very close to my heart and is available from the [International Coffee Organization](http://www.ico.org/new_historical.asp):
 
-```{r packages, echo=FALSE, include=TRUE}
-library("tidyverse")
+```{r packages, echo=TRUE, include=TRUE}
+suppressMessages(library("tidyverse"))
 library("stringr")
 library("assertthat")
 ```
@@ -111,15 +111,9 @@ assertthat::are_equal(nrow(coffee), 34L)  # 'L' is for integer, obviously
 
 This test fails because there are a number of observations that aren't counties, such as the European Union, a `Total`, and the copyright information for the data.
 There's also a '`Belgium/Luxembourg`' row where the data for these countries was combined in earlier years.
-Lets remove these and re-test (first I'm going to save the total for a later test):
+Lets remove these and re-test:
 
 ```{r fix-n-countries}
-coffee_total <- 
-  coffee %>% 
-  filter(country == "Total") %>% 
-  select(`2013`) %>% 
-  as.numeric(.)
-
 coffee <- 
   readxl::read_xlsx(temp, skip = 3) %>% 
   rename(country = "Calendar years") %>% 
@@ -136,22 +130,100 @@ assertthat::are_equal(nrow(coffee), 34L)
 ```
 
 Another problem fixed.
-Now, lets see if everything adds up correctly:
+Now we have our script to prepare the data and our tests to make sure it's working as intended.
+They should look something like this now:
 
-```{r test-sum}
-assertthat::are_equal(
-  sum(coffee$`2013`), coffee_total
-)
+```{r coffee-final}
+coffee <- 
+  readxl::read_xlsx(temp, skip = 3) %>% 
+  rename(country = "Calendar years") %>% 
+  select(country, `2013`) %>% 
+  filter(!is.na(country)) %>% 
+  filter(
+    country != "European Union",
+    country != "Total",
+    !str_detect(country, "International Coffee Organization"),
+    country != "Belgium/Luxembourg"
+  )
+
+assertthat::noNA(coffee$country)
+assertthat::noNA(coffee$`2013`)
+assertthat::are_equal(nrow(coffee), 34L)
 ```
 
-So, no.
-But, the difference is pretty small so it's likely to be a rounding error.
-We can change the tolerance of the test to make it pass in this case.
-This means we can still include the test and, if we did something drastic to the data (like drop the USA by mistake) we'd still notice:
+One of the advantages of having specified our tests is that if we go back and change something in our script and accidentally break something, the tests will alert us.
+Imagine we accidentally remove one of the countries:
 
-```{r test-sum-tolerance}
-assertthat::are_equal(
-  sum(coffee$`2013`), coffee_total,
-  tol = 10
-)
+```{r coffee-remove-country}
+coffee <- coffee[1:33, ]  # oops, we meant 34 (or even better nrow(coffee)!)
 ```
+
+Now the tests will fail alerting us to the issue:
+
+```{r coffee-test-remove-country}
+assertthat::noNA(coffee$country)
+assertthat::noNA(coffee$`2013`)
+assertthat::are_equal(nrow(coffee), 34L)
+```
+
+
+## Testing functions
+
+The other things you should test are functions.
+Functions are useful to perform the same procedure on multiple objects.
+Imagine we want to convert the units in our `coffee` table from its current 'thousands of 60kg bags' to simply kg.
+Ordinarily in R we'd just do this as a vector operation, but lets write a function to illustrate the point.
+Create the function in `R/` which we can do automatically with `usethis`:
+
+```{r create-function-file, eval=FALSE}
+usethis::use_r("convert-unit")
+```
+
+The function itself should take a number, multiply it by 60, and multiply it by 1000:
+
+```{r convert-bags-to-kg-function, eval=FALSE}
+convert_bags_kg <- function(bags) {
+  kg = bags * 60 * 1000
+  kg
+}
+```
+
+You can load functions in `R/` files with `devtools::load_all()`.
+
+```{r load-function}
+devtools::load_all()
+```
+
+Before we use the function, lets test it and make sure it produces the correct output.
+I would expect 50 units in the coffee table to be equivalent to (50 $\times$ 60 $\times$ 1000 $=$) 3,000,000kg.
+I would also expect that if the function encountered an `NA` it would return an `NA` (`NA` $\times$ 60 $\times$ 1000 $=$ `NA`!) so I'm also going to explicitly test for this.
+
+Add a test to the `tests/` directory with:
+
+```{r write-test-function, eval=FALSE}
+usethis::use_test("convert_bags_kg")
+```
+
+And run the test with `devtools::test()`:
+
+```{r run-test}
+devtools::test()
+```
+
+The output will tell you which (if any) tests fail and which pass.
+
+Now we can confidently convert from thousands of 60kg bags to kg in the `coffee` data set:
+
+```{r convert-coffee-bags-kg}
+coffee <- 
+  coffee %>% 
+  mutate(kg = convert_bags_kg(`2013`)) %>% 
+  select(country, kg)
+
+head(coffee)
+```
+
+That's `r sum(coffee$kg)`kg of coffee in 2013, or `r coffee$kg[coffee$country == "United Kingdom"]`kg in the UK, of which I myself drank `r coffee$kg[coffee$country == "United Kingdom"] / 10`kg.
+
+Again, the advantage of explicitly writing unit tests is that, if we modify the function and accidentally break its behaviour, the unit tests will alert us.
+Try it and see!
