@@ -31,7 +31,7 @@ In a data analysis project, that will usually boil down to:
 
 We don't need to test everything.
 Instead, prioritise functions and code blocks that are more complex, are more fragile, or that depend on or feed into other blocks of code.
-But, be careful not to assume something is obvious:
+But, be careful not to assume the output of a block of code is obvious:
 
 ```{r vector-test}
 x <- 1:5
@@ -44,3 +44,114 @@ By way of explanation, `is.vector()` only returns `TRUE` if the object is a vect
 
 ## Data analysis scripts - testing inline
 
+For data analysis scripts I recommend you add checks to your script as you go along.
+You're probably already checking your results so it's often just a case of writing the tests explicitly in your script rather than testing interactively.
+
+I find tests are most useful when I'm doing something that could change the data without me realising, such as:
+
+- Any joins or merges - ALWAYS check you have the right number of cases!
+- Where you change the type of an object, especially when going from character to numeric, or numeric to logical.
+- Where `NA`s might be introduced, such as a `full_join()`. `assertthat::noNA()` is useful for this.
+- When dealing with factors, especially with numbers as factor levels (is it `1.0`, or is it factor level `1`?).
+
+The example tests here are relatively trivial, but are only designed to show you how to test, not *what* to test.
+Let's load the packages we need and save some data to a temporary directory demonstrate.
+The data is very close to my heart and is available from the [International Coffee Organization](http://www.ico.org/new_historical.asp):
+
+```{r packages, echo=FALSE, include=TRUE}
+library("tidyverse")
+library("stringr")
+library("assertthat")
+```
+
+```{r download-data}
+temp_dir <- tempdir()
+temp <- tempfile(tmpdir = temp_dir, fileext = ".xlsx")
+download.file(
+  "http://www.ico.org/historical/1990%20onwards/Excel/2b%20-%20Imports.xlsx",
+  destfile = temp
+)
+```
+
+```{r coffee-skip}
+coffee <- 
+  readxl::read_xlsx(temp, skip = 3) %>% 
+  rename(country = "Calendar years") %>% 
+  select(country, `2013`)
+head(coffee)
+```
+
+You can no doubt see a number of problems, but lets see if we can pick this up with testing.
+We can use base's `stopifnot()` or the `assertthat` package for tests.
+Both do essentially the same thing, but you can add a customised error message with `assertthat::assert_that()` which is sometimes useful.
+
+First I want to make sure there aren't any blank rows:
+
+```{r test-blank-row}
+assertthat::noNA(coffee$country)
+```
+
+On seeing this I would amend my script and, when re-run, hopefully the test will pass:
+
+```{r fix-blank-rows}
+coffee <- 
+  readxl::read_xlsx(temp, skip = 3) %>% 
+  rename(country = "Calendar years") %>% 
+  select(country, `2013`) %>% 
+  filter(!is.na(country))
+
+assertthat::noNA(coffee$country)
+```
+
+Next, I know from opening the Excel file there are 34 countries with data, so lets check:
+
+```{r test-n-countries}
+assertthat::are_equal(nrow(coffee), 34L)  # 'L' is for integer, obviously
+```
+
+This test fails because there are a number of observations that aren't counties, such as the European Union, a `Total`, and the copyright information for the data.
+There's also a '`Belgium/Luxembourg`' row where the data for these countries was combined in earlier years.
+Lets remove these and re-test (first I'm going to save the total for a later test):
+
+```{r fix-n-countries}
+coffee_total <- 
+  coffee %>% 
+  filter(country == "Total") %>% 
+  select(`2013`) %>% 
+  as.numeric(.)
+
+coffee <- 
+  readxl::read_xlsx(temp, skip = 3) %>% 
+  rename(country = "Calendar years") %>% 
+  select(country, `2013`) %>% 
+  filter(!is.na(country)) %>% 
+  filter(
+    country != "European Union",
+    country != "Total",
+    !str_detect(country, "International Coffee Organization"),
+    country != "Belgium/Luxembourg"
+  )
+
+assertthat::are_equal(nrow(coffee), 34L)
+```
+
+Another problem fixed.
+Now, lets see if everything adds up correctly:
+
+```{r test-sum}
+assertthat::are_equal(
+  sum(coffee$`2013`), coffee_total
+)
+```
+
+So, no.
+But, the difference is pretty small so it's likely to be a rounding error.
+We can change the tolerance of the test to make it pass in this case.
+This means we can still include the test and, if we did something drastic to the data (like drop the USA by mistake) we'd still notice:
+
+```{r test-sum-tolerance}
+assertthat::are_equal(
+  sum(coffee$`2013`), coffee_total,
+  tol = 10
+)
+```
