@@ -46,6 +46,9 @@ By way of explanation, `is.vector()` only returns `TRUE` if the object is a vect
 
 For data analysis scripts I recommend you add checks to your script as you go along.
 You're probably already checking your results so it's often just a case of writing the tests explicitly in your script rather than testing interactively.
+This also makes it easier to pick up code after a break.
+
+![It's older code, sir, but it checks out](img/older-code.png)
 
 I find tests are most useful when I'm doing something that could change the data without me realising, such as:
 
