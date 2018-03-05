@@ -9,3 +9,8 @@ LazyData: true
 ByteCompile: true
 Suggests: 
     testthat
+Imports: 
+    readxl,
+    tidyverse,
+    assertthat,
+    stringr
