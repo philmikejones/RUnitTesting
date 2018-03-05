@@ -151,6 +151,8 @@ assertthat::noNA(coffee$`2013`)
 assertthat::are_equal(nrow(coffee), 34L)
 ```
 
+![You are technically correct](img/technically_correct.jpg)
+
 One of the advantages of having specified our tests is that if we go back and change something in our script and accidentally break something, the tests will alert us.
 Imagine we accidentally remove one of the countries:
 
@@ -165,6 +167,8 @@ assertthat::noNA(coffee$country)
 assertthat::noNA(coffee$`2013`)
 assertthat::are_equal(nrow(coffee), 34L)
 ```
+
+![The bug you fixed introduces a new bug](img/new-bug.jpeg)
 
 
 ## Testing functions
@@ -227,3 +231,7 @@ That's `r sum(coffee$kg)`kg of coffee in 2013, or `r coffee$kg[coffee$country ==
 
 Again, the advantage of explicitly writing unit tests is that, if we modify the function and accidentally break its behaviour, the unit tests will alert us.
 Try it and see!
+
+## A final note
+
+![Not sure if good code of crap unit tests](img/not-sure-if.jpg)
