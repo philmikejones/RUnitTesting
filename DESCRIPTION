@@ -13,4 +13,5 @@ Imports:
     readxl,
     tidyverse,
     assertthat,
-    stringr
+    stringr,
+    devtools
