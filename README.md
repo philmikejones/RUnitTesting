@@ -5,16 +5,7 @@ RUnitTesting
 
 These are my notes on unit testing in R developed for the [Sheffield R User Group](http://sheffieldr.github.io/) on 6 March 2018.
 
-Why test?
----------
-
 ![I find your lack of unit tests disturbing](img/lack-of-unit-tests-disturbing.png)
-
-See the [Testing chapter of Advanced R](http://r-pkgs.had.co.nz/tests.html) for a full discussion of why we should test our outputs, but to summarise:
-
--   Testing helps us discover bugs; we can't fix what we don't know isn't broken.
--   Fewer bugs ≈ greater confidence in our code and outputs
--   Ensure we don't break something when we introduce new code
 
 Setup
 -----

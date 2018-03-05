@@ -1,0 +1,39 @@
+---
+title: "Unit testing in R"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+
+## Why test?
+
+See the [Testing chapter of Advanced R](http://r-pkgs.had.co.nz/tests.html) for a full discussion of why we should test our outputs, but to summarise:
+
+- Testing helps us discover bugs; we can't fix what we don't know isn't broken.
+- Fewer bugs $\approx$ greater confidence in our code and outputs
+- Ensure we don't break something when we introduce new code
+- Prevent this just before publication:
+
+![Testing just before publication](img/test-in-production.jpg)
+
+
+## What to test?
+
+We should ideally test as much code output as is useful and possible.
+In a data analysis project, that will usually boil down to:
+
+- Data preparation scripts, and
+- Functions
+
+We don't need to test everything.
+Instead, prioritise functions and code blocks that are more complex, are more fragile, or that depend on or feed into other blocks of code.
+But, be careful not to assume something is obvious:
+
+```{r vector-test}
+x <- 1:5
+attr(x, "label") <- letters[1:5]
+is.vector(x)
+```
+
+By way of explanation, `is.vector()` only returns `TRUE` if the object is a vector and has no attributes apart from `names` (http://adv-r.had.co.nz/Data-structures.html#vectors)
