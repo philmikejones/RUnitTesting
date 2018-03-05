@@ -8,5 +8,4 @@ Encoding: UTF-8
 LazyData: true
 ByteCompile: true
 Suggests: 
-    covr,
     testthat
