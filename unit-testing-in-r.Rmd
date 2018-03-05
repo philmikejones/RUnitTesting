@@ -1,6 +1,9 @@
 ---
 title: "Unit testing in R"
-output: html_notebook
+output: 
+  html_notebook:
+    theme: flatly
+    css: image-align.css
 editor_options: 
   chunk_output_type: inline
 ---
@@ -37,3 +40,7 @@ is.vector(x)
 ```
 
 By way of explanation, `is.vector()` only returns `TRUE` if the object is a vector and has no attributes apart from `names` (http://adv-r.had.co.nz/Data-structures.html#vectors)
+
+
+## Data analysis scripts - testing inline
+
