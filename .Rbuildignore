@@ -2,3 +2,5 @@
 ^README\.Rmd$
 ^LICENSE\.md$
 ^codecov\.yml$
+^.*\.Rproj$
+^\.Rproj\.user$
