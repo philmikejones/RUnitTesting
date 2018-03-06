@@ -16,10 +16,11 @@ We need to install a few packages to perform tests and check test coverage. `use
 install.packages(c("usethis", "testthat", "covr"))
 ```
 
-`usethis` expects your project to behave like a package, so we should add a `DESCRIPTION`:
+`usethis` expects your project to behave like a package, so we should add a `DESCRIPTION` and `NAMESPACE`:
 
 ``` r
 usethis::use_description()
+usethis::use_namespace()
 ```
 
 It also wouldn't hurt to [add a license](http://r-pkgs.had.co.nz/description.html#license) and a [README](http://r-pkgs.had.co.nz/release.html#important-files).
