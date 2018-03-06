@@ -35,11 +35,16 @@ But, be careful not to assume the output of a block of code is obvious:
 
 ```{r vector-test}
 x <- 1:5
+is.vector(x)
+```
+
+```{r vector-attr-test}
 attr(x, "label") <- letters[1:5]
 is.vector(x)
 ```
 
-By way of explanation, `is.vector()` only returns `TRUE` if the object is a vector and has no attributes apart from `names` (http://adv-r.had.co.nz/Data-structures.html#vectors)
+By way of explanation, `is.vector()` only returns `TRUE` if the object is a vector and has no attributes apart from `names` (http://adv-r.had.co.nz/Data-structures.html#vectors).
+This is definitely one to watch out for if you regularly import SPSS files and include the label attributes.
 
 
 ## Data analysis scripts - testing inline
@@ -68,17 +73,16 @@ library("assertthat")
 ```
 
 ```{r download-data}
-temp_dir <- tempdir()
-temp <- tempfile(tmpdir = temp_dir, fileext = ".xlsx")
+dir.create("inst/extdata", showWarnings = FALSE, recursive = TRUE)
 download.file(
   "http://www.ico.org/historical/1990%20onwards/Excel/2b%20-%20Imports.xlsx",
-  destfile = temp
+  destfile = "inst/extdata/coffee.xlsx"
 )
 ```
 
 ```{r coffee-skip}
 coffee <- 
-  readxl::read_xlsx(temp, skip = 3) %>% 
+  readxl::read_xlsx("inst/extdata/coffee.xlsx", skip = 3) %>% 
   rename(country = "Calendar years") %>% 
   select(country, `2013`)
 head(coffee)
@@ -98,7 +102,7 @@ On seeing this I would amend my script and, when re-run, hopefully the test will
 
 ```{r fix-blank-rows}
 coffee <- 
-  readxl::read_xlsx(temp, skip = 3) %>% 
+  readxl::read_xlsx("inst/extdata/coffee.xlsx", skip = 3) %>% 
   rename(country = "Calendar years") %>% 
   select(country, `2013`) %>% 
   filter(!is.na(country))
@@ -118,7 +122,7 @@ Lets remove these and re-test:
 
 ```{r fix-n-countries}
 coffee <- 
-  readxl::read_xlsx(temp, skip = 3) %>% 
+  readxl::read_xlsx("inst/extdata/coffee.xlsx", skip = 3) %>% 
   rename(country = "Calendar years") %>% 
   select(country, `2013`) %>% 
   filter(!is.na(country)) %>% 
@@ -138,7 +142,7 @@ They should look something like this now:
 
 ```{r coffee-final}
 coffee <- 
-  readxl::read_xlsx(temp, skip = 3) %>% 
+  readxl::read_xlsx("inst/extdata/coffee.xlsx", skip = 3) %>% 
   rename(country = "Calendar years") %>% 
   select(country, `2013`) %>% 
   filter(!is.na(country)) %>% 
@@ -223,7 +227,16 @@ Now we can confidently convert from thousands of 60kg bags to kg in the `coffee`
 
 ```{r convert-coffee-bags-kg}
 coffee <- 
-  coffee %>% 
+  readxl::read_xlsx("inst/extdata/coffee.xlsx", skip = 3) %>% 
+  rename(country = "Calendar years") %>% 
+  select(country, `2013`) %>% 
+  filter(!is.na(country)) %>% 
+  filter(
+    country != "European Union",
+    country != "Total",
+    !str_detect(country, "International Coffee Organization"),
+    country != "Belgium/Luxembourg"
+  ) %>% 
   mutate(kg = convert_bags_kg(`2013`)) %>% 
   select(country, kg)
 
@@ -234,6 +247,17 @@ That's `r sum(coffee$kg)`kg of coffee in 2013, or `r coffee$kg[coffee$country ==
 
 Again, the advantage of explicitly writing unit tests is that, if we modify the function and accidentally break its behaviour, the unit tests will alert us.
 Try it and see!
+
+
+### Coverage reports
+
+If you're testing using `testthat` in this way, you can easily run reports that indicate how much of your code is tested with automated tests.
+You can get a coverage report with `covr`:
+
+```{r test-report}
+covr::report()
+```
+
 
 ## A final note
 
