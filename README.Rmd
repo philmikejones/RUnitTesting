@@ -55,3 +55,8 @@ If you do want to set this up you need to:
 
 1. Set up `travis` (`usethis::use_travis()`)
 1. Set up coverage (`usethis::use_coverage()`). Both `coveralls.io` and `codecov.io` are free for open source projects, and `codecov.io` allows you to test coverage for one private github repo.
+
+
+## Demonstration
+
+Now you're set up you can clone or download this repo ([download and extract the repo](https://github.com/philmikejones/RUnitTesting/archive/master.zip) if you don't know what this means) and follow the examples in `unit-testing-in-r.nb.html`.
