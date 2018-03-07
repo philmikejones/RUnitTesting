@@ -1,8 +1,5 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-RUnitTesting
-============
-
 These are my notes on unit testing in R developed for the [Sheffield R User Group](http://sheffieldr.github.io/) on 6 March 2018.
 
 ![I find your lack of unit tests disturbing](img/lack-of-unit-tests-disturbing.png)
@@ -44,7 +41,7 @@ If you do want to set this up you need to:
 1.  Set up `travis` (`usethis::use_travis()`)
 2.  Set up coverage (`usethis::use_coverage()`). Both `coveralls.io` and `codecov.io` are free for open source projects, and `codecov.io` allows you to test coverage for one private github repo.
 
-Demonstration
+Start testing
 -------------
 
 Now you're set up you can clone or download this repo ([download and extract the repo](https://github.com/philmikejones/RUnitTesting/archive/master.zip) if you don't know what this means) and follow the examples in `unit-testing-in-r.nb.html`.
